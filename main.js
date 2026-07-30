@@ -1,4 +1,4 @@
-const { Plugin } = require('obsidian');
+const { Plugin, MarkdownRenderer } = require('obsidian');
 
 module.exports = class ProgbarPlugin extends Plugin {
     async onload() {
@@ -83,7 +83,13 @@ module.exports = class ProgbarPlugin extends Plugin {
             };
 
             const container = el.createDiv();
-            const nameLabel = container.createEl('span', { text: name });
+            const nameLabel = container.createEl('span');
+            await MarkdownRenderer.renderMarkdown(name, nameLabel, '', this);
+            const renderedP = nameLabel.querySelector('p');
+            if (renderedP) {
+                while (renderedP.firstChild) nameLabel.insertBefore(renderedP.firstChild, renderedP);
+                renderedP.remove();
+            }
             const btnsub = container.createEl('button', { text: btnDown });
             const progress = container.createEl('progress', { attr: { max, value: initialValue, id: uuid } });
             const btnadd = container.createEl('button', { text: btnUp });
